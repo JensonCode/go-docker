@@ -21,14 +21,15 @@ func (router *UserRouter) Register(r *mux.Router) {
 }
 
 func userHanlders(w http.ResponseWriter, r *http.Request) error {
-	if r.Method == "GET" {
-		return HandleGetUser(w, r)
-	}
+
 	if r.Method == "POST" {
-		return HandleGetUser(w, r)
+		return HandleCreateUser(w, r)
+	}
+	if r.Method == "PUT" {
+		return HandleChangeUser(w, r)
 	}
 	if r.Method == "DELETE" {
-		return HandleGetUser(w, r)
+		return HandleDeteleUser(w, r)
 	}
 
 	return fmt.Errorf("request method is not allowed: %s", r.Method)
