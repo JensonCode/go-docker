@@ -1,5 +1,5 @@
 build:
-	@go build -o bin/go-docker main.go
+	@go build -o bin/go-docker cmd/go-docker/main.go
 
 run: build
 	@./bin/go-docker
