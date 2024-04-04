@@ -2,7 +2,6 @@ package server
 
 import (
 	"log"
-	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -19,6 +18,6 @@ func Run() *APIServer {
 
 	return &APIServer{
 		Router: router,
-		Port:   os.Getenv("PORT"),
+		Port:   ":1337",
 	}
 }
