@@ -6,9 +6,9 @@ import (
 	"github.com/JensonCode/go-docker/pkg/response"
 )
 
-type Services func(http.ResponseWriter, *http.Request) error
+type handler func(http.ResponseWriter, *http.Request) error
 
-func HttpHandler(f Services) http.HandlerFunc {
+func HttpHandler(f handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := f(w, r); err != nil {
 			response.WriteError(w, err)
