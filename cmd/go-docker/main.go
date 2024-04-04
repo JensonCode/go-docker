@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/JensonCode/go-docker/internal/api/user"
+	"github.com/JensonCode/go-docker/internal/models"
 	"github.com/JensonCode/go-docker/pkg/database"
-	"github.com/JensonCode/go-docker/pkg/request"
 	"github.com/JensonCode/go-docker/pkg/server"
 	"github.com/gorilla/mux"
 )
@@ -68,23 +68,24 @@ func createUserTable() error {
 
 func createDefaultUser() error {
 	log.Println("creating default user")
+	defer log.Println("Complete create default user")
+	isCreated, err := user.UserService.IsUsernameExist("admin")
+	if err != nil {
+		return err
+	}
 
-	defaultUser, err := user.UserService.CreateUser(
-		&request.UserRequest{
+	if isCreated {
+		return nil
+	}
+
+	_, err = user.UserService.Create(
+		&models.UserRequest{
 			Username: "admin",
 			Password: "admin",
 		},
 	)
 
 	if err != nil {
-		return err
-	}
-
-	query := `insert into users
-		(username, password, created_at)
-		values ($1, $2, $3)`
-
-	if _, err := database.Postgres.DB.Query(query, defaultUser.Username, defaultUser.Password, defaultUser.CreatedAt); err != nil {
 		return err
 	}
 
