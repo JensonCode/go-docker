@@ -79,7 +79,7 @@ func createDefaultUser() error {
 	}
 
 	_, err = user.UserService.Create(
-		&models.UserRequest{
+		&models.CreateUserRequest{
 			Username: "admin",
 			Password: "admin",
 		},

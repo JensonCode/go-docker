@@ -10,7 +10,7 @@ import (
 )
 
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) error {
-	req := new(models.UserRequest)
+	req := new(models.CreateUserRequest)
 	req, err := request.ReadJSON(r, req)
 	if err != nil {
 		return response.WriteError(w, err)
@@ -24,10 +24,20 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) error {
 	return response.WriteResponse(w, u)
 }
 
-func HandleChangeUser(w http.ResponseWriter, r *http.Request) error {
-	fmt.Println("handle change account")
+func HandleUpdateUser(w http.ResponseWriter, r *http.Request) error {
 
-	return nil
+	req := new(models.UpdateUserRequest)
+	req, err := request.ReadJSON(r, req)
+	if err != nil {
+		return response.WriteError(w, err)
+	}
+
+	u, err := UserService.Update(req)
+	if err != nil {
+		return response.WriteError(w, err)
+	}
+
+	return response.WriteResponse(w, u)
 }
 
 func HandleDeteleUser(w http.ResponseWriter, r *http.Request) error {

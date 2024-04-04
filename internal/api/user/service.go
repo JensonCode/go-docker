@@ -1,7 +1,6 @@
 package user
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -14,23 +13,7 @@ type UserServices struct{}
 
 var UserService = new(UserServices)
 
-func scanUsers(rows *sql.Rows) (*models.User, error) {
-	user := new(models.User)
-	err := rows.Scan(
-		&user.ID,
-		&user.Username,
-		&user.Password,
-		&user.CreatedAt,
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
-func (s *UserServices) Create(req *models.UserRequest) (*models.User, error) {
+func (s *UserServices) Create(req *models.CreateUserRequest) (*models.User, error) {
 
 	used, err := s.IsUsernameExist(req.Username)
 	if err != nil {
@@ -60,25 +43,58 @@ func (s *UserServices) Create(req *models.UserRequest) (*models.User, error) {
 	}, nil
 }
 
-func (s *UserServices) GetByID(id uint) ([]*models.User, error) {
+func (s *UserServices) Update(req *models.UpdateUserRequest) (*models.User, error) {
 
-	query := `select * from users where id=$1`
+	user, err := s.GetByUsername(req.Username)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, fmt.Errorf("user not found")
+	}
 
-	rows, err := database.Postgres.DB.Query(query)
+	compare := bcrypt.CompareHashAndPassword(user.Password, req.Password)
+	if !compare {
+		return nil, fmt.Errorf("incorrect password")
+	}
+
+	encrypted, err := bcrypt.EncryptPassword(req.NewPassword)
 	if err != nil {
 		return nil, err
 	}
 
-	users := []*models.User{}
-	for rows.Next() {
-		user, err := scanUsers(rows)
-		if err != nil {
-			return nil, err
-		}
-		users = append(users, user)
+	req.Password = encrypted
+
+	ok := s.Save(&req.CreateUserRequest)
+
+	if !ok {
+		return nil, fmt.Errorf("error saving user")
 	}
 
-	return users, nil
+	return &models.User{
+		Username:  req.Username,
+		Password:  encrypted,
+		CreatedAt: time.Now().UTC(),
+	}, nil
+}
+
+func (s *UserServices) GetByUsername(username string) (*models.User, error) {
+
+	user := new(models.User)
+
+	query := `select * from users where username=$1 limit 1`
+
+	err := database.Postgres.DB.QueryRow(query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Password,
+		&user.CreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *UserServices) IsUsernameExist(username string) (bool, error) {
@@ -94,7 +110,7 @@ func (s *UserServices) IsUsernameExist(username string) (bool, error) {
 	return count > 0, nil
 }
 
-func (s *UserServices) Save(req *models.UserRequest) (ok bool) {
+func (s *UserServices) Save(req *models.CreateUserRequest) (ok bool) {
 	query := `insert into users
 	(username, password, created_at)
 	values ($1, $2, $3)`

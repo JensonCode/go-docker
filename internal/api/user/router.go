@@ -18,6 +18,7 @@ func (router *UserRouter) Register(r *mux.Router) {
 	log.Println("Resiger User Router")
 
 	r.HandleFunc("/user", handler.HttpHandler(userHanlders))
+
 }
 
 func userHanlders(w http.ResponseWriter, r *http.Request) error {
@@ -26,10 +27,7 @@ func userHanlders(w http.ResponseWriter, r *http.Request) error {
 		return HandleCreateUser(w, r)
 	}
 	if r.Method == "PUT" {
-		return HandleChangeUser(w, r)
-	}
-	if r.Method == "DELETE" {
-		return HandleDeteleUser(w, r)
+		return HandleUpdateUser(w, r)
 	}
 
 	return fmt.Errorf("request method is not allowed: %s", r.Method)

@@ -9,7 +9,12 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type UserRequest struct {
+type CreateUserRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type UpdateUserRequest struct {
+	CreateUserRequest
+	NewPassword string `json:"new_password"`
 }
