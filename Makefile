@@ -7,5 +7,6 @@ run: build
 test:
 	@go test -v ./...
 	
-docker-run-local:
+docker-run:
+	@docker-compose down
 	@docker-compose up --build
