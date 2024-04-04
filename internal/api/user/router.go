@@ -6,28 +6,29 @@ import (
 	"net/http"
 
 	"github.com/JensonCode/go-docker/pkg/handler"
+
 	"github.com/gorilla/mux"
 )
 
-type UserRouter struct {
-}
+type UserRouter struct{}
 
 var Router = new(UserRouter)
 
-func (r *UserRouter) Register(router *mux.Router) {
+func (router *UserRouter) Register(r *mux.Router) {
 	log.Println("Resiger User Router")
-	router.HandleFunc("/user", handler.HttpHandler(UserServices))
+
+	r.HandleFunc("/user", handler.HttpHandler(userHanlders))
 }
 
-func UserServices(w http.ResponseWriter, r *http.Request) error {
+func userHanlders(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "GET" {
-		return HandleGetAccount(w, r)
+		return HandleGetUser(w, r)
 	}
 	if r.Method == "POST" {
-		return HandleGetAccount(w, r)
+		return HandleGetUser(w, r)
 	}
 	if r.Method == "DELETE" {
-		return HandleGetAccount(w, r)
+		return HandleGetUser(w, r)
 	}
 
 	return fmt.Errorf("request method is not allowed: %s", r.Method)
