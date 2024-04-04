@@ -1,4 +1,4 @@
-FROM golang:latest  AS builder
+FROM golang:latest AS builder
 
 WORKDIR /app
 
@@ -8,10 +8,7 @@ RUN go mod tidy
 
 COPY . .
 
-ENV PORT=":1337"
 
-EXPOSE 1337
-
-RUN go build -o /app/bin/go-docker /app/main.go
+RUN go build -o /app/bin/go-docker /app/cmd/go-docker/main.go
 
 CMD ["/app/bin/go-docker"]
